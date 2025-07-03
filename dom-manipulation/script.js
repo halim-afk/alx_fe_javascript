@@ -1,58 +1,64 @@
-// ✅ Simulate fetching from a server (mock function)
-async function fetchServerQuotes() {
+// ✅ Function: Fetch quotes from mock server
+async function fetchQuotesFromServer() {
     try {
-      // Simulated "server" URL (you can replace this with a real API or file server)
-      const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=3');
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=3'); // Simulated API
       const serverQuotes = await response.json();
   
-      // Simulate mapping server posts to quote objects
-      const mapped = serverQuotes.map(post => ({
+      // Map server data to our format
+      const mappedQuotes = serverQuotes.map(post => ({
         text: post.title,
         category: "Server"
       }));
   
-      resolveConflicts(mapped);
-    } catch (err) {
-      console.error("Error fetching server quotes:", err);
+      syncQuotes(mappedQuotes);
+    } catch (error) {
+      console.error("Failed to fetch quotes from server:", error);
     }
   }
   
-  // ✅ Conflict resolution strategy: server data replaces local only if new
-  function resolveConflicts(serverQuotes) {
-    let newAdded = 0;
+  // ✅ Function: Sync server quotes with local and resolve conflicts
+  function syncQuotes(serverQuotes) {
+    let newQuotes = 0;
   
     serverQuotes.forEach(serverQuote => {
-      const exists = quotes.some(q => q.text === serverQuote.text);
+      const exists = quotes.some(localQuote => localQuote.text === serverQuote.text);
       if (!exists) {
         quotes.push(serverQuote);
-        newAdded++;
+        newQuotes++;
       }
     });
   
-    if (newAdded > 0) {
+    if (newQuotes > 0) {
       saveQuotes();
       populateCategories();
-      notifyUser(`${newAdded} quote(s) synced from server.`);
+      notifySyncUpdate(`${newQuotes} quote(s) synced from server.`);
     }
   }
   
-  // ✅ Display a sync message
-  function notifyUser(message) {
-    const banner = document.createElement("div");
-    banner.textContent = message;
-    banner.style.background = "#e0ffe0";
-    banner.style.border = "1px solid green";
-    banner.style.padding = "10px";
-    banner.style.marginTop = "20px";
-    banner.style.fontWeight = "bold";
+  // ✅ Function: Post new quote to server (mock POST)
+  async function postQuoteToServer(quote) {
+    try {
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(quote)
+      });
   
-    document.body.insertBefore(banner, document.body.firstChild);
-  
-    setTimeout(() => {
-      banner.remove();
-    }, 5000);
+      if (response.ok) {
+        console.log("Quote posted to server:", await response.json());
+      }
+    } catch (err) {
+      console.error("Failed to post quote:", err);
+    }
   }
   
-  // ✅ Periodically sync every 30 seconds
-  setInterval(fetchServerQuotes, 30000);
+  // ✅ Function: Notify UI about sync/conflict updates
+  function notifySyncUpdate(message) {
+    const banner = document.createElement("div");
+    banner.textContent = message;
+    banner.style.background = "#ffffcc";
+    banner.style.border = "1px solid #cccc00";
+    banner.style.padding = "10px";
+    banner.style.margin = "10px 0";
+    ban
   
