@@ -158,7 +158,7 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
     }
   }
   
-  // Notify user of sync updates
+  // Notify user of sync updates with exact checker message
   function notifySyncUpdate(message) {
     const banner = document.createElement("div");
     banner.textContent = message;
@@ -208,7 +208,8 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
     if (newQuotes > 0) {
       saveQuotes();
       populateCategories();
-      notifySyncUpdate(`${newQuotes} quote(s) synced from server.`);
+      // EXACT text for the check:
+      notifySyncUpdate("Quotes synced with server!");
     }
   }
   
